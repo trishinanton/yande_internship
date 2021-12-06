@@ -13,7 +13,6 @@ const findText = arr.filter(a=>a.indexOf('text')>-1)
 const findLink = arr.filter(a=>a.indexOf('((')>-1)
 const findItem = arr.filter(a=>a.indexOf('*')>-1)
 
-
 const head = findHead.map(h=>h.split(' '))[0].filter(e=>e.indexOf('=')===-1).join(' ').trim()
 const paragraphWith = findText.map(h=>h.split('text'))[0].join('')
 const paragraph = paragraphWith.slice(0,paragraphWith.length -1)
