@@ -1,36 +1,56 @@
-const str = `
+const commits = [
+    {
+        id: '1',
+        message: 'initial commit',
+        timestamp: 1624010073113
+    },
+    {
+        id: '2',
+        parents: ['1'],
+        message: 'add layout',
+        timestamp: 1624010082219
+    },
+    {
+        id: '3',
+        parents: ['2'],
+        message: 'fix bugs',
+        timestamp: 1624010109039,
+        branches: ['master', 'bugfix']
+    },
+    {
+        id: '4',
+        parents: ['2'],
+        message: 'add link',
+        timestamp: 1624010179662,
+        branches: ['feature/link']
+    }
+]
 
-    = head res
-    
-    text ((https://ya.ru link)) text.
-    
-    * item
-    * item
-`
-const arr = str.split(/\n\s*/)
-const findHead = arr.filter(a=>a.indexOf('=')>-1)
-const findText = arr.filter(a=>a.indexOf('text')>-1)
-const findLink = arr.filter(a=>a.indexOf('((')>-1)
-const findItem = arr.filter(a=>a.indexOf('*')>-1)
+const branches = ['bugfix', 'feature/link']
 
+function getLastCommonCommitMessage(commits, branches) {
+    const firstBranch = branches[0];
+    const secondBranch = branches[1];
 
-const head = findHead.map(h=>h.split(' '))[0].filter(e=>e.indexOf('=')===-1).join(' ').trim()
-const paragraphWith = findText.map(h=>h.split('text'))[0].join('')
-const paragraph = paragraphWith.slice(0,paragraphWith.length -1)
-
-const url = findLink.map(h=>h.split(' '))[0].filter(e=>e.indexOf('((')>-1).map(h=>h.split('(('))[0].join('').trim()
-const textLink = findLink.map(h=>h.split(' '))[0].filter(e=>e.indexOf('))')>-1).map(h=>h.split('))'))[0].join('').trim()
-
-const item = findItem.map(h=>h.split(' ')).map(a=>a.filter(arr=>arr.indexOf('*')===-1)).map(a=>a.join(''))
-
-
-const it = (item)=>{
-    let li = item.map(e=>{
-        return '<li>'+e+'</li>'
+    const commitsWithBranches = commits.filter(c => {
+        if (c.branches) {
+            return c.branches.find(b => b === firstBranch | b === secondBranch) !== undefined
+        }
     })
-    return li.join('')
+    const arrayParents = commitsWithBranches.map(c => c.parents.join(''))
+
+    let set = new Set()
+    arrayParents.map(a=>set.add(a))
+
+
+    ///////////////////////////
+    const commit = commits.filter(c=> [...set].includes(c.id) )
+    const maxTime =  Math.max(...commit.map(c=>c.timestamp))
+    return commits.find(c=>c.timestamp === maxTime).message
+
+
+
 }
-const string = (head,paragraph,it)=>{
-    return '<h1>'+head+'</h1>' + '<p>text'+paragraph+'text.</p>'+'<ul>'+it(item)+'</ul>'
-}
-console.log(string(head,paragraph,it))
+
+console.log(getLastCommonCommitMessage(commits,branches))
+
