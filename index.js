@@ -1,36 +1,35 @@
-const str = `
-
-    = head res
-    
-    text ((https://ya.ru link)) text.
-    
-    * item
-    * item
-`
-const arr = str.split(/\n\s*/)
-const findHead = arr.filter(a=>a.indexOf('=')>-1)
-const findText = arr.filter(a=>a.indexOf('text')>-1)
-const findLink = arr.filter(a=>a.indexOf('((')>-1)
-const findItem = arr.filter(a=>a.indexOf('*')>-1)
+module.exports = function winners(wait, pushResult, STREET_RACERS, N) {
 
 
-const head = findHead.map(h=>h.split(' '))[0].filter(e=>e.indexOf('=')===-1).join(' ').trim()
-const paragraphWith = findText.map(h=>h.split('text'))[0].join('')
-const paragraph = paragraphWith.slice(0,paragraphWith.length -1)
+    let racers = {}
+    let firstRacers = []
+    const callBack = (racer,loseControl) => {
+        if(loseControl===undefined) racers[racer].push('check')
+        // else racers[racer].push('lose')
+        console.log(racers)
+            return new Promise(res=>{
+                setTimeout(res, 0)
+            }).then(()=>{
+                // if(racers[racer].length===N){
+                if(racers[racer].filter(r=>r==='check').length === N){
+                    firstRacers.push(racer)
+                    if(firstRacers.length === 3) pushResult(firstRacers)
+                }
+            })
 
-const url = findLink.map(h=>h.split(' '))[0].filter(e=>e.indexOf('((')>-1).map(h=>h.split('(('))[0].join('').trim()
-const textLink = findLink.map(h=>h.split(' '))[0].filter(e=>e.indexOf('))')>-1).map(h=>h.split('))'))[0].join('').trim()
 
-const item = findItem.map(h=>h.split(' ')).map(a=>a.filter(arr=>arr.indexOf('*')===-1)).map(a=>a.join(''))
+    }
 
+    STREET_RACERS.map(racer=>{
 
-const it = (item)=>{
-    let li = item.map(e=>{
-        return '<li>'+e+'</li>'
+        racers[racer] = []
+
+        for (let i = 1; i <= N; i++){
+            wait(racer, i, (loseControl)=>callBack(racer,loseControl))
+
+        }
     })
-    return li.join('')
+
+
+
 }
-const string = (head,paragraph,it)=>{
-    return '<h1>'+head+'</h1>' + '<p>text'+paragraph+'text.</p>'+'<ul>'+it(item)+'</ul>'
-}
-console.log(string(head,paragraph,it))
